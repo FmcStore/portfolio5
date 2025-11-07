@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portofolio | Akses Langsung</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url("https://fonts.googleapis.com/css?family=DM+Sans:400,500|Jost:400,500,600&display=swap");
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Jost", sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(40, 40, 40, 0.8) 0%, rgba(0, 0, 0, 0.9) 100%);
+            z-index: -1;
+        }
+
+        .card {
+            max-width: 420px;
+            margin: auto;
+            position: relative;
+            z-index: 1;
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(15px);
+            display: flex;
+            flex-direction: column;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: cardAppear 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes cardAppear {
+            0% {
+                opacity: 0;
+                transform: translate3d(0, 40px, 0) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+        }
+
+        .card-header {
+            position: relative;
+            display: flex;
+            height: 180px;
+            flex-shrink: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .logo {
+            font-size: 4rem;
+            color: #fff;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+        }
+
+        .card-subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-top: 5px;
+            font-weight: 400;
+        }
+
+        .card-content {
+            padding: 30px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .redirect-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 35px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+            margin-top: 10px;
+        }
+
+        .redirect-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.7s ease;
+        }
+
+        .redirect-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .redirect-btn:hover::before {
+            left: 100%;
+        }
+
+        .redirect-btn i {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .redirect-btn:hover i {
+            transform: translateX(5px);
+        }
+
+        .description {
+            text-align: center;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 25px;
+            font-size: 1rem;
+            font-family: "DM Sans", sans-serif;
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            opacity: 0.1;
+            animation: floatCinematic 15s ease-in-out infinite;
+        }
+
+        .element-1 {
+            width: 120px;
+            height: 120px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .element-2 {
+            width: 80px;
+            height: 80px;
+            top: 70%;
+            left: 85%;
+            animation-delay: 3s;
+        }
+
+        .element-3 {
+            width: 60px;
+            height: 60px;
+            top: 20%;
+            left: 80%;
+            animation-delay: 6s;
+        }
+
+        .element-4 {
+            width: 100px;
+            height: 100px;
+            top: 80%;
+            left: 15%;
+            animation-delay: 9s;
+        }
+
+        @keyframes floatCinematic {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg) scale(1); 
+            }
+            33% { 
+                transform: translateY(-20px) rotate(120deg) scale(1.05); 
+            }
+            66% { 
+                transform: translateY(10px) rotate(240deg) scale(0.95); 
+            }
+        }
+
+        .exit-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+
+        .exit-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .loading-text {
+            font-size: 1.5rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: #fff;
+            text-transform: uppercase;
+            animation: loadingPulse 1.5s infinite alternate;
+        }
+
+        @keyframes loadingPulse {
+            from { opacity: 0.5; transform: scale(1); }
+            to { opacity: 1; transform: scale(1.02); }
+        }
+
+        .audio-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            cursor: pointer;
+            z-index: 20;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .audio-toggle:hover {
+            background: rgba(50, 50, 50, 0.8);
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                max-width: 350px;
+            }
+            
+            .card-content {
+                padding: 25px;
+            }
+            
+            .logo {
+                font-size: 3.5rem;
+            }
+            
+            .card-title {
+                font-size: 1.6rem;
+            }
+            
+            .redirect-btn {
+                padding: 14px 30px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-element element-1"></div>
+        <div class="floating-element element-2"></div>
+        <div class="floating-element element-3"></div>
+        <div class="floating-element element-4"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-arrow-right logo"></i>
+            <h1 class="card-title">Portofolio</h1>
+            <p class="card-subtitle">Akses Langsung</p>
+        </div>
+        
+        <div class="card-content">
+            <p class="description">
+                Menuju ke galeri karya digital terpilih. Klik tombol di bawah untuk mengakses portofolio lengkap.
+            </p>
+            
+            <a href="#" class="redirect-btn" id="redirect-btn">
+                Masuk ke Portofolio <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="exit-overlay" id="exit-overlay">
+        <div class="loading-text">Mengalihkan ke Portofolio</div>
+    </div>
+
+    <div class="audio-toggle" id="audio-toggle">
+        <i class="fas fa-volume-up"></i>
+    </div>
+
+    <audio id="bg-audio" loop autoplay>
+        <!-- Ganti dengan path file musik Anda -->
+        <source src="music.mp3" type="audio/mpeg">
+        Browser Anda tidak mendukung elemen audio.
+    </audio>
+
+    <script>
+        // Redirect with cinematic exit
+        const redirectBtn = document.getElementById('redirect-btn');
+        const exitOverlay = document.getElementById('exit-overlay');
+        const bgAudio = document.getElementById('bg-audio');
+        const audioToggle = document.getElementById('audio-toggle');
+        
+        // Auto-play audio with user interaction workaround
+        let audioEnabled = true;
+        
+        // Enable audio after user interaction
+        document.body.addEventListener('click', function() {
+            if (audioEnabled && bgAudio.paused) {
+                bgAudio.play().catch(e => console.log("Audio play failed:", e));
+            }
+        }, { once: true });
+        
+        audioToggle.addEventListener('click', function() {
+            audioEnabled = !audioEnabled;
+            if (audioEnabled) {
+                bgAudio.play();
+                audioToggle.innerHTML = '<i class="fas fa-volume-up"></i>';
+            } else {
+                bgAudio.pause();
+                audioToggle.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            }
+        });
+
+        redirectBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Show exit overlay
+            exitOverlay.classList.add('active');
+            
+            // Redirect after delay
+            setTimeout(function() {
+                window.location.href = 'https://portofolio-one-phi-72.vercel.app/portofolio5/index.html';
+            }, 2000);
+        });
+
+        // Add keyboard shortcut (Enter key to redirect)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                redirectBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
