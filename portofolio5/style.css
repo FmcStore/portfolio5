@@ -776,7 +776,7 @@ header {
 }
 /* Tambahkan di bagian paling bawah file CSS */
 
-/* WhatsApp Floating Button */
+/* WhatsApp Floating Button 
 .whatsapp-float {
     position: fixed;
     bottom: 25px;
@@ -811,7 +811,7 @@ header {
     box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
 }
 
-/* Hamburger Menu Animation */
+/* Hamburger Menu Animation 
 .menu-toggle i {
     transition: transform 0.3s ease;
 }
@@ -820,7 +820,7 @@ header {
     transform: rotate(90deg);
 }
 
-/* AOS Animation Adjustments */
+AOS Animation Adjustments 
 [data-aos] {
     pointer-events: none;
 }
@@ -829,7 +829,7 @@ header {
     pointer-events: auto;
 }
 
-/* Improved Mobile Menu */
+Improved Mobile Menu 
 @media screen and (max-width: 768px) {
     .slide-menu {
         display: flex;
@@ -856,4 +856,5 @@ header {
         background: rgba(255, 255, 255, 0.1);
         border-radius: 5px;
     }
-}
+}*/
+
