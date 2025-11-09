@@ -774,3 +774,86 @@ header {
         bottom: 5%;
     }
 }
+/* Tambahkan di bagian paling bawah file CSS */
+
+/* WhatsApp Floating Button */
+.whatsapp-float {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    background: #25D366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(100px);
+    transition: all 0.5s ease;
+}
+
+.whatsapp-float.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.whatsapp-float a {
+    color: white;
+    font-size: 2rem;
+    text-decoration: none;
+}
+
+.whatsapp-float:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+}
+
+/* Hamburger Menu Animation */
+.menu-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.menu-toggle.active i {
+    transform: rotate(90deg);
+}
+
+/* AOS Animation Adjustments */
+[data-aos] {
+    pointer-events: none;
+}
+
+[data-aos].aos-animate {
+    pointer-events: auto;
+}
+
+/* Improved Mobile Menu */
+@media screen and (max-width: 768px) {
+    .slide-menu {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .slide-menu ul {
+        width: 100%;
+    }
+    
+    .slide-menu ul li {
+        margin: 25px 0;
+    }
+    
+    .slide-menu ul li a {
+        font-size: 1.3rem;
+        padding: 10px 20px;
+        display: block;
+        transition: all 0.3s ease;
+    }
+    
+    .slide-menu ul li a:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+    }
+}
