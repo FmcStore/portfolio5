@@ -1,4 +1,4 @@
-// AOS Initialization
+/*// AOS Initialization
 AOS.init({
     duration: 1000,
     once: true,
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 600);
         });
     });
-});
+});"*/
 
 const headerLinks = document.querySelectorAll(".header-list a");
 headerLinks.forEach(link => {
@@ -196,6 +196,7 @@ const slideMenu = document.getElementById('slide-menu');
 menuToggle.addEventListener('click', () => {
     slideMenu.classList.toggle('active');
 });
+
 
 
 
