@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perplexity AI Chat</title> 
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        :root {
+            --primary-color: #1a73e8; 
+            --light-bg: #f8f9fa; 
+            --chat-bg: #ffffff; 
+            --sidebar-bg: #f0f4f9; 
+            --input-bg: #f0f4f9; 
+            --border-color: #e0e0e0; 
+            --user-msg-bg: #e6f0ff; 
+            --text-primary: #1f1f1f; 
+            --text-secondary: #5f6368; 
+            --gemini-gradient: linear-gradient(135deg, #4285F4, #9B59B6, #EA4335, #FBBC05);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --perplexity-color: #8B5CF6;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--chat-bg);
+            padding: 12px 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo-img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .model-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .model-info {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .model-info.perplexity {
+            color: var(--perplexity-color);
+            background: #f3eefd;
+        }
+        
+        .model-info .material-icons {
+            font-size: 16px;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: var(--text-primary);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .new-chat-btn {
+            background: #dde7f3;
+            color: var(--text-primary);
+            border: none;
+            padding: 12px;
+            border-radius: 24px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .new-chat-btn:hover {
+            background: #d0ddef;
+        }
+
+        .history {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .history-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+        }
+        
+        .history-title .material-icons {
+            font-size: 18px;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .history-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .history-item .material-icons {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--chat-bg);
+            position: relative;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .message {
+            display: flex;
+            gap: 16px;
+            max-width: 100%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: var(--shadow);
+        }
+
+        /* PERUBAHAN: Mengganti avatar pengguna dengan gambar Anda */
+        .user .message-avatar {
+            background-image: url('https://files.catbox.moe/gpw6ah.png');
+            background-size: cover;
+            background-position: center;
+            background-color: #e6f0ff; /* Fallback color */
+        }
+
+        .bot .message-avatar {
+            background-image: url('https://files.catbox.moe/yfxidj.png');
+            background-size: cover;
+            background-position: center;
+            background-color: #f0f0f0; 
+        }
+
+        .message-content {
+            max-width: 90%;
+            padding: 1px 0; 
+            line-height: 1.6;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            font-size: 16px;
+        }
+
+        .user .message-content {
+            background: var(--user-msg-bg);
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: 20px;
+            border-top-left-radius: 5px;
+        }
+
+        .bot .message-content {
+            background: transparent;
+            color: var(--text-primary);
+            padding-top: 5px; 
+        }
+        
+        .message-content p {
+            margin-bottom: 12px;
+        }
+
+        .math-formula { 
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+        }
+
+        .code-language {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .inline-code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #333;
+            border: 1px solid var(--border-color);
+        }
+
+        .bot .message-content ul, 
+        .bot .message-content ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+
+        .bot .message-content li {
+            margin: 8px 0;
+        }
+
+        .bot .message-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .bot .message-content th, 
+        .bot .message-content td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: left;
+        }
+
+        .bot .message-content th {
+            background-color: var(--light-bg);
+        }
+
+        .input-container {
+            padding: 20px 20px 30px 20px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--chat-bg);
+            position: relative;
+        }
+
+        .input-wrapper {
+            display: flex;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            background: var(--input-bg);
+            border-radius: 28px; 
+            border: 1px solid transparent;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .input-wrapper:focus-within {
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            background: white;
+            border-color: var(--border-color);
+        }
+
+        .input-wrapper textarea {
+            flex: 1;
+            padding: 14px 55px 14px 20px;
+            border: none;
+            border-radius: 28px;
+            resize: none;
+            font-size: 16px;
+            outline: none;
+            max-height: 200px;
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .send-btn {
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #dce1e7;
+            color: var(--primary-color);
+        }
+
+        .send-btn:disabled {
+            background: transparent;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 10px 0;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .welcome-message {
+            text-align: left;
+            margin-top: 40px;
+            color: var(--text-secondary);
+        }
+
+        .welcome-message h2 {
+            margin-bottom: 20px;
+            font-weight: 500;
+            font-size: 48px;
+            line-height: 1.2;
+            color: #c0c0c0;
+        }
+        
+        .welcome-message h2 span {
+            background: var(--gemini-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .welcome-message p {
+            max-width: 600px;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .model-badge {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .model-badge .material-icons {
+            font-size: 14px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            background: var(--light-bg);
+        }
+
+        .suggestion-chips {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px;
+            margin-top: 30px;
+            max-width: 600px;
+        }
+
+        .suggestion-chip {
+            background: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .suggestion-chip:hover {
+            background: #dde7f3;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .perplexity-source {
+            background: rgba(139, 92, 246, 0.05);
+            border-left: 3px solid var(--perplexity-color);
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .perplexity-source a {
+            color: var(--perplexity-color);
+            text-decoration: none;
+        }
+
+        .perplexity-source a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .sidebar {
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                z-index: 1000;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .model-info {
+                display: none;
+            }
+
+            .logo h1 {
+                display: none; 
+            }
+
+            .chat-messages, .input-container {
+                max-width: 100%;
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .suggestion-chips {
+                grid-template-columns: 1fr; 
+            }
+
+            .welcome-message h2 {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <button class="mobile-menu-btn" id="mobile-menu-btn">
+                <span class="material-icons">menu</span>
+            </button>
+            <img src="https://files.catbox.moe/yfxidj.png" class="header-logo-img" alt="logo">
+            <h1>Perplexity Chat</h1>
+        </div>
+        <div class="model-selector">
+            <div class="model-info perplexity" id="model-info">
+                <span class="material-icons">travel_explore</span>
+                <span>Perplexity AI</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar" id="sidebar">
+            <button class="new-chat-btn" id="new-chat-btn">
+                <span class="material-icons">add</span>
+                New Chat
+            </button>
+            <div class="history">
+                <div class="history-title">
+                    <span>Recent</span>
+                    <span class="material-icons">history</span>
+                </div>
+                <div class="history-item">
+                    <span class="material-icons">chat_bubble_outline</span>
+                    <span>Teorema Pythagoras</span>
+                </div>
+                <div class="history-item">
+                    <span class="material-icons">chat_bubble_outline</span>
+                    <span>Kalkulus Dasar</span>
+                </div>
+                <div class="history-item">
+                    <span class="material-icons">chat_bubble_outline</span>
+                    <span>Fisika Mekanika</span>
+                </div>
+                <div class="history-item">
+                    <span class="material-icons">chat_bubble_outline</span>
+                    <span>Programming Python</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="welcome-message">
+                    <h2><span>Halo!</span><br>Saya Perplexity Chat</h2>
+                    <p>Saya adalah asisten AI yang didukung oleh Perplexity. Tanyakan apa saja kepada saya.</p>
+                    
+                    <div class="suggestion-chips">
+                        <div class="suggestion-chip" data-prompt="Jelaskan teorema Pythagoras dengan contoh perhitungan">Teorema Pythagoras</div>
+                        <div class="suggestion-chip" data-prompt="Tulis program Python untuk menghitung luas segitiga">Programming Python</div>
+                        <div class="suggestion-chip" data-prompt="Jelaskan hukum Newton dengan contoh">Hukum Newton</div>
+                        <div class="suggestion-chip" data-prompt="Berita terkini tentang perkembangan AI">Berita AI Terkini</div>
+                    </div>
+                </div>
+            </div>
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea id="message-input" placeholder="Tanyakan sesuatu..." rows="1"></textarea>
+                    <button class="send-btn" id="send-btn">
+                        <span class="material-icons">send</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Powered by Perplexity AI API &copy; 2023 AI Assistant
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageInput = document.getElementById('message-input');
+            const sendBtn = document.getElementById('send-btn');
+            const newChatBtn = document.getElementById('new-chat-btn');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const sidebar = document.getElementById('sidebar');
+            
+            window.MathJax = {
+                tex: {
+                    inlineMath: [['$', '$'], ['\\(', '\\)']],
+                    displayMath: [['$$', '$$'], ['\\[', '\\]']] 
+                },
+                svg: {
+                    fontCache: 'global'
+                }
+            };
+            
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            
+            sendBtn.addEventListener('click', sendMessage);
+            
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            newChatBtn.addEventListener('click', function() {
+                chatMessages.innerHTML = `
+                    <div class="welcome-message">
+                        <h2><span>Halo!</span><br>Saya Perplexity Chat</h2>
+                        <p>Saya adalah asisten AI yang didukung oleh Perplexity. Tanyakan apa saja kepada saya.</p>
+                        
+                        <div class="suggestion-chips">
+                            <div class="suggestion-chip" data-prompt="Jelaskan teorema Pythagoras dengan contoh perhitungan">Teorema Pythagoras</div>
+                            <div class="suggestion-chip" data-prompt="Tulis program Python untuk menghitung luas segitiga">Programming Python</div>
+                            <div class="suggestion-chip" data-prompt="Jelaskan hukum Newton dengan contoh">Hukum Newton</div>
+                            <div class="suggestion-chip" data-prompt="Berita terkini tentang perkembangan AI">Berita AI Terkini</div>
+                        </div>
+                    </div>
+                `;
+                attachSuggestionListeners();
+            });
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    !mobileMenuBtn.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+            
+            function attachSuggestionListeners() {
+                document.querySelectorAll('.suggestion-chip').forEach(chip => {
+                    chip.addEventListener('click', function() {
+                        const prompt = this.getAttribute('data-prompt');
+                        messageInput.value = prompt;
+                        sendMessage();
+                    });
+                });
+            }
+            
+            attachSuggestionListeners();
+            
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (!message) return;
+                
+                addMessage(message, 'user');
+                messageInput.value = '';
+                messageInput.style.height = 'auto';
+                sendBtn.disabled = true;
+                
+                showTypingIndicator();
+                callPerplexityAPI(message);
+            }
+            
+            function addMessage(content, sender) {
+                const welcomeMessage = document.querySelector('.welcome-message');
+                if (welcomeMessage && sender === 'user') {
+                    welcomeMessage.remove();
+                }
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'message-avatar';
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                
+                if (sender === 'user') {
+                    // PERUBAHAN: Mengosongkan innerHTML, CSS akan menangani gambar
+                    avatarDiv.innerHTML = ''; 
+                    const p = document.createElement('p');
+                    p.textContent = content;
+                    contentDiv.appendChild(p);
+
+                } else {
+                    avatarDiv.innerHTML = ''; 
+                    
+                    const formattedContent = formatBotResponse(content);
+                    contentDiv.innerHTML = formattedContent;
+                    
+                    const modelBadge = document.createElement('div');
+                    modelBadge.className = 'model-badge';
+                    modelBadge.innerHTML = `<span class="material-icons" style="font-size: 14px;">travel_explore</span> Perplexity AI`;
+                    contentDiv.appendChild(modelBadge);
+                }
+                
+                messageDiv.appendChild(avatarDiv);
+                messageDiv.appendChild(contentDiv);
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                if (sender === 'bot') {
+                    MathJax.typesetPromise([contentDiv]).catch((err) => console.log('MathJax error:', err));
+                }
+            }
+            
+            function formatBotResponse(text) {
+                let formattedText = text;
+
+                // 1. Code Blocks (```)
+                formattedText = formattedText.replace(/```(\w+)?\s*([\s\S]*?)```/g, function(match, lang, code) {
+                    const language = lang || 'code';
+                    const escapedCode = code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    return `<div class="code-block"><span class="code-language">${language}</span><pre><code>${escapedCode.trim()}</code></pre></div>`;
+                });
+
+                // 2. Inline Code (`)
+                formattedText = formattedText.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+                
+                // 3. Bold/Italic
+                formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+                // 4. Lists (handles \n)
+                formattedText = formattedText.replace(/^\s*[\-\*]\s(.*?)$/gm, '<ul><li>$1</li></ul>');
+                formattedText = formattedText.replace(/<\/ul>\n<ul>/g, ''); 
+                
+                formattedText = formattedText.replace(/^\s*\d+\.\s(.*?)$/gm, '<ol><li>$1</li></ol>');
+                formattedText = formattedText.replace(/<\/ol>\n<ol>/g, ''); 
+
+                // 5. Paragraf
+                let finalHtml = '';
+                const blocks = formattedText.split(/\n{2,}/); 
+
+                blocks.forEach(block => {
+                    if (block.startsWith('<div class="code-block">') || block.startsWith('<ul>') || block.startsWith('<ol>')) {
+                        finalHtml += block; 
+                    } else if (block.trim().length > 0) {
+                        finalHtml += `<p>${block.replace(/\n/g, '<br>')}</p>`;
+                    }
+                });
+                
+                return finalHtml;
+            }
+            
+            function showTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message bot';
+                typingDiv.id = 'typing-indicator';
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'message-avatar';
+                avatarDiv.innerHTML = ''; 
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'typing-indicator';
+                for (let i = 0; i < 3; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'typing-dot';
+                    typingIndicator.appendChild(dot);
+                }
+                
+                contentDiv.appendChild(typingIndicator);
+                typingDiv.appendChild(avatarDiv);
+                typingDiv.appendChild(contentDiv);
+                
+                chatMessages.appendChild(typingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            function hideTypingIndicator() {
+                const typingIndicator = document.getElementById('typing-indicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+            
+            function callPerplexityAPI(text) {
+                const apiUrl = `https://fgsi.dpdns.org/api/ai/perplexity?apikey=fgsiapi-27a08a79-6d&text=${encodeURIComponent(text)}`;
+                
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        hideTypingIndicator();
+                        sendBtn.disabled = false;
+                        
+                        if (data.status && data.data) {
+                            let answer = 'Maaf, saya tidak dapat menemukan jawaban yang tepat.';
+                            
+                            if (data.data.text && Array.isArray(data.data.text)) {
+                                const finalStep = data.data.text.find(step => step.step_type === 'FINAL');
+                                if (finalStep && finalStep.content && finalStep.content.answer) {
+                                    try {
+                                        const answerObj = JSON.parse(finalStep.content.answer);
+                                        answer = answerObj.answer || finalStep.content.answer;
+                                    } catch (e) {
+                                        answer = finalStep.content.answer;
+                                    }
+                                }
+                            }
+                            addMessage(answer, 'bot');
+                        } else {
+                            addMessage('Maaf, Perplexity AI mengalami kesalahan. Silakan coba lagi.', 'bot');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        hideTypingIndicator();
+                        sendBtn.disabled = false;
+                        addMessage('Maaf, ada masalah saat menghubungi Perplexity AI. Silakan coba lagi.', 'bot');
+                    });
+            }
+            
+            attachSuggestionListeners();
+        });
+    </script>
+</body>
+</html>
