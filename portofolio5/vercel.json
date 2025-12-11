@@ -1,0 +1,11 @@
+ {
+  "rewrites": [
+    { "source": "/", "destination": "/portofolio5/index.html" },
+    { "source": "/about", "destination": "/portofolio5/about.html" },
+    { "source": "/project", "destination": "/portofolio5/project.html" },
+    { "source": "/contact", "destination": "/portofolio5/contact.html" }
+  ],
+  "redirects": [
+    { "source": "/portofolio5/:path*", "destination": "/:path", "permanent": true }
+  ]
+}
